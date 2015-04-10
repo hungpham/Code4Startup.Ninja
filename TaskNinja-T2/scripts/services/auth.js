@@ -1,6 +1,6 @@
 'use strict';
 
-app.factory('Auth', function(FURL, $firebaseAuth, $firebase) {
+app.factory('Auth', function(FURL, $firebaseAuth, $firebase, $location, toaster) {
 	
 	var ref = new Firebase(FURL);
 	var auth = $firebaseAuth(ref);
@@ -37,6 +37,59 @@ app.factory('Auth', function(FURL, $firebaseAuth, $firebase) {
         });
     },
 
+    loginSocial: function(socialName) {
+      console.log(socialName);
+      ref.authWithOAuthPopup(socialName, function(error, authData) {
+        if (error) {
+          console.log("Login Failed!", error);
+        } else {
+          console.log("Authenticated successfully with payload:", authData);
+          toaster.pop('success', "Logged in successfully");
+          if(socialName == 'facebook') {
+            Auth.user = {
+              name: authData.facebook.displayName,
+              email: authData.facebook.email,
+              gravatar: authData.facebook.cachedUserProfile.picture.data.url,
+              cachedUserProfile: authData.facebook.cachedUserProfile
+            };  
+          } else if(socialName == 'twitter') {
+            Auth.user = {
+              name: authData.twitter.displayName,
+              email: '',
+              gravatar: authData.twitter.cachedUserProfile.profile_image_url,
+              cachedUserProfile: authData.twitter.cachedUserProfile
+            }; 
+          }
+          
+
+          var profileRef = $firebase(ref.child('profile'));
+          return profileRef.$set(authData.uid, Auth.user);
+        }
+      });
+    },
+
+    registerSocial: function(socialName) {
+      console.log(socialName);
+      ref.authWithOAuthPopup("facebook", function(error, authData) {
+        if (error) {
+          console.log("Register Failed!", error);
+        } else {
+          console.log("Authenticated successfully with payload:", authData);
+          toaster.pop('success', "Logged in successfully");
+          var profile  = {
+            name: authData.facebook.displayName,
+            email: authData.facebook.email,
+            gravatar: authData.facebook.cachedUserProfile.picture.data.url,
+            cachedUserProfile: authData.facebook.cachedUserProfile
+          };
+
+          var profileRef = $firebase(ref.child('profile'));
+
+          return profileRef.$set(authData.uid, profile);
+        }
+      });
+    },
+
     logout: function() {
       auth.$unauth();
     },
@@ -51,9 +104,11 @@ app.factory('Auth', function(FURL, $firebaseAuth, $firebase) {
 	};
 
 	auth.$onAuth(function(authData) {
+    console.log("on auth.$onAuth");
 		if(authData) {      
       angular.copy(authData, Auth.user);
-      Auth.user.profile = $firebase(ref.child('profile').child(authData.uid)).$asObject();			
+      Auth.user.profile = $firebase(ref.child('profile').child(authData.uid)).$asObject();
+      $location.path('/');
 		} else {
       if(Auth.user && Auth.user.profile) {
         Auth.user.profile.$destroy();

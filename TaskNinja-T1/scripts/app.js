@@ -7,7 +7,7 @@ var app = angular
     'ngRoute',    
     'firebase'
   ])
-  .constant('FURL', 'https://task-ninja.firebaseio.com/')  
+  .constant('FURL', 'https://taskhp.firebaseio.com/')  
   .config(function ($routeProvider) {
     $routeProvider      
       .when('/', {
@@ -19,6 +19,10 @@ var app = angular
         controller: 'TaskController'
       })
       .when('/edit/:taskId', {
+        templateUrl: 'views/edit.html',
+        controller: 'TaskController'
+      })
+      .when('/edit/:taskId/', {
         templateUrl: 'views/edit.html',
         controller: 'TaskController'
       })

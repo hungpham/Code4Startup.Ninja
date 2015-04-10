@@ -8,7 +8,7 @@ var app = angular
     'firebase',
     'toaster'
   ])
-  .constant('FURL', 'https://task-ninja.firebaseio.com/')  
+  .constant('FURL', 'https://taskhp.firebaseio.com/')  
   .config(function ($routeProvider) {
     $routeProvider      
       .when('/', {

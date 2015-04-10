@@ -5,7 +5,7 @@ app.controller('TaskController', function($scope, $firebase, FURL, $location, $r
 	var ref = new Firebase(FURL);
 	var fbTasks = $firebase(ref.child('tasks')).$asArray();
 	var taskId = $routeParams.taskId;
-
+	
 	$scope.tasks = fbTasks;
 	
 	if(taskId) {

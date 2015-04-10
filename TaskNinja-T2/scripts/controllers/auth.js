@@ -6,7 +6,7 @@ app.controller('AuthController', function($scope, $location, toaster, Auth) {
     $location.path('/');
   }
 
-	$scope.register = function(user) {    	    
+  $scope.register = function(user) {          
     Auth.register(user)
       .then(function() {
         toaster.pop('success', "Registered successfully");
@@ -15,32 +15,52 @@ app.controller('AuthController', function($scope, $location, toaster, Auth) {
         toaster.pop('error', "Oops! Something went wrong.");
         // errMessage(err);
       });
+  };
+
+	$scope.registerSocial = function(socialName) {
+    
+    Auth.registerSocial(socialName)
+      .then(function() {
+        toaster.pop('success', "Registered successfully");
+        $location.path('/');
+      }, function(err) {
+        toaster.pop('error', "Oops! Something went wrong.");
+        // errMessage(err);
+        console.log(err);
+      });
 	};
 
-	$scope.login = function(user) {
+  $scope.login = function(user) {
     
     Auth.login(user)
       .then(function() {
         toaster.pop('success', "Logged in successfully");
         $location.path('/');
+        $scope.currentUser = Auth.user;
       }, function(err) {        
         toaster.pop('error', "Oops! Something went wrong.");
         // errMessage(err);
       });   
+  };
+
+	$scope.loginSocial = function(socialName) {
+    
+    Auth.loginSocial(socialName);
 	};
 
 	$scope.changePassword = function(user) {
-    
+    user.email = $scope.currentUser.profile.email;
     Auth.changePassword(user)
       .then(function() {                        
         
         // Reset form
-        $scope.user.email = '';
+        // $scope.user.email = '';
         $scope.user.oldPass = '';
         $scope.user.newPass = '';
 
         toaster.pop('success', "Password changed successfully");
       }, function(err) {
+        console.log(err);
         toaster.pop('error', "Oops! Something went wrong.");
         // errMessage(err);
       });        
